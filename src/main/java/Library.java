@@ -15,6 +15,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,40 +26,56 @@ public final class Library {
         this.books = books;
     }
 
-    public void add(Book book, String shelfCode) {
+    public boolean add(Book book, String shelfCode) {
+        if (shelfCode == null || book == null) return false;
         book.shelfCode = shelfCode;
         books.add(book);
+        return true;
     }
 
-    public void delete(Book book) {
-        books.remove(book);
+    public boolean delete(Book book) {
+        if (book != null) { return books.remove(book); }
+        return false;
     }
 
-    public void edit(Book book, String newName, String newAuthor, List<String> newGenres) {
-        book.name = newName;
-        book.author = newAuthor;
-        book.genres = newGenres;
+    public boolean edit(Book book, Book newBook) {
+        if (book == null || newBook == null) return false;
+        for (int i = 0; i < books.size(); i++) {
+            if (books.get(i).equals(book)) {
+                books.set(i, newBook);
+                return true;
+            }
+        }
+        return false;
     }
 
-    public void move(Book book, String newShelfCode) {
-        book.shelfCode = newShelfCode;
+    public boolean move(Book book, String newShelfCode) {
+        if (book == null || newShelfCode == null) return false;
+        for (Book cBook: books) {
+            if (cBook.equals(book)) {
+                cBook.shelfCode = newShelfCode;
+                return true;
+            }
+        }
+        return false;
     }
 
     //use null if parameter isn't important
-    public List<Book> find(String wordsFromName, String name, String author,
-                           List<String> genres, String shelfCode) {
+    public List<Book> find(String name, String author,
+                           String genres, String shelfCode) {
         List<Book> result = new ArrayList<>();
 
         for (Book book: books) {
-            if (name != null || wordsFromName != null)
-                if (!(book.name.contains(wordsFromName) || book.name.equals(name))) continue;
+            if (name != null)
+                if (!book.name.contains(name)) continue;
                 
             if (author != null) 
                 if (!book.author.equals(author)) continue;
                 
             boolean g = true;
-            if (!genres.isEmpty()) {
-                for (String genre: genres) {
+            List<String> genresList = Arrays.asList(genres.split(",\s*"));
+            if (!genresList.isEmpty()) {
+                for (String genre: genresList) {
                     if (!book.genres.contains(genre)) {
                         g = false;
                         break;
@@ -94,6 +111,6 @@ public final class Library {
     }
 
     public static void main(String[] args) {
-        //System.out.println("" + null);
+        //System.out.println("adventure".contains("adventure"));
     }
 }
