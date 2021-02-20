@@ -6,7 +6,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class LibraryTest {
-    Book book = new Book("HPMOR", "Eliezer Yudkowsky", "", "");
+    Book book = new Book("HPMOR", "Eliezer Yudkowsky", "adventure", "");
     Book newBook = new Book("HPMOR", "Eliezer Yudkowsky", "", "A5");
 
     private Library createLibrary(Book book) {
@@ -60,9 +60,9 @@ public class LibraryTest {
         Book fantasyBook = new Book("random fantasy", "unknown", "fantasy, adventure", "A5");
         library.add(fantasyBook, "A5");
         List<Book> expected = new ArrayList<>();
-        expected.add(newBook);
+        expected.add(fantasyBook);
 
-        List<Book> result = library.find("HPMOR",null, "adventure", null);
+        List<Book> result = library.find(null,null, "fantasy", null);
         assertEquals(expected, result);
     }
 }

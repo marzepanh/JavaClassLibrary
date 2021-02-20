@@ -65,24 +65,21 @@ public final class Library {
                            String genres, String shelfCode) {
         List<Book> result = new ArrayList<>();
 
+        outer:
         for (Book book: books) {
             if (name != null)
                 if (!book.name.contains(name)) continue;
                 
             if (author != null) 
-                if (!book.author.equals(author)) continue;
-                
-            boolean g = true;
+                if (!book.author.contains(author)) continue;
+
             List<String> genresList = Arrays.asList(genres.split(",\s*"));
             if (!genresList.isEmpty()) {
                 for (String genre: genresList) {
-                    if (!book.genres.contains(genre)) {
-                        g = false;
-                        break;
-                    }
+                    if (!book.genres.contains(genre)) continue outer;
                 }
-                if (!g) continue;
             }
+
             if (shelfCode != null)
                 if (!book.shelfCode.equals(shelfCode)) continue;
             result.add(book);
@@ -111,6 +108,6 @@ public final class Library {
     }
 
     public static void main(String[] args) {
-        //System.out.println("adventure".contains("adventure"));
+        //System.out.println();
     }
 }
