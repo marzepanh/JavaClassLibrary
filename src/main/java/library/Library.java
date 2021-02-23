@@ -11,24 +11,46 @@
 5. поиск книг по разным признакам (по автору, по
    названию, по словам из названия, по жанру, по коду полки, по комбинации этих
    признаков)
-Нумерация: И3, где A - номер отдела(и - история), 3 - номер полки
+Нумерация: И3, где И - первая буква названия, 3 - номер полки
  */
+package library;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public final class Library {
-    private final List<Book> books;
+    private final List<Book> books = new ArrayList<>();
 
-    public Library(List<Book> books) {
-        this.books = books;
+    public Library(Book ... newBooks) {
+        for (Book book: newBooks) {
+            if (book != null) {
+                if (!book.getShelfCode().matches("[A-ZА-Я]\\d+"))
+                    book.setShelfCode(generateShelfCode(book.getName()));
+                books.add(book);
+            }
+        }
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    private String generateShelfCode(String name) {
+        Random random = new Random();
+        int code = 1 + random.nextInt(12); //random int between [1; 12]
+        char ch = name.charAt(0);
+        if (Character.isLetter(ch)) return "" + Character.toUpperCase(ch) + code;
+        return "undefined" + code;
     }
 
     public boolean add(Book book, String shelfCode) {
         if (shelfCode == null || book == null) return false;
-        book.shelfCode = shelfCode;
+        if (!shelfCode.matches("[A-ZА-Я]\\d+"))
+            throw new IllegalArgumentException("Wrong shelfCode");
+        book.setShelfCode(shelfCode);
         books.add(book);
         return true;
     }
@@ -40,11 +62,12 @@ public final class Library {
 
     public boolean edit(Book book, Book newBook) {
         if (book == null || newBook == null) return false;
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).equals(book)) {
-                books.set(i, newBook);
-                return true;
-            }
+        if (!newBook.getShelfCode().matches("[A-ZА-Я]\\d+"))
+            throw new IllegalArgumentException("Wrong shelfCode");
+        int i = books.indexOf(book);
+        if (i != -1) {
+            books.set(i, newBook);
+            return true;
         }
         return false;
     }
@@ -53,7 +76,9 @@ public final class Library {
         if (book == null || newShelfCode == null) return false;
         for (Book cBook: books) {
             if (cBook.equals(book)) {
-                cBook.shelfCode = newShelfCode;
+                if (!newShelfCode.matches("[A-ZА-Я]\\d+"))
+                    throw new IllegalArgumentException("Wrong shelfCode");
+                cBook.setShelfCode(newShelfCode);
                 return true;
             }
         }
@@ -62,29 +87,13 @@ public final class Library {
 
     //use null if parameter isn't important
     public List<Book> find(String name, String author,
-                           String genres, String shelfCode) {
-        List<Book> result = new ArrayList<>();
-
-        outer:
-        for (Book book: books) {
-            if (name != null)
-                if (!book.name.contains(name)) continue;
-                
-            if (author != null) 
-                if (!book.author.contains(author)) continue;
-
-            List<String> genresList = Arrays.asList(genres.split(",\s*"));
-            if (!genresList.isEmpty()) {
-                for (String genre: genresList) {
-                    if (!book.genres.contains(genre)) continue outer;
-                }
-            }
-
-            if (shelfCode != null)
-                if (!book.shelfCode.equals(shelfCode)) continue;
-            result.add(book);
-        }
-        return result;
+                           List<String> genres, String shelfCode) {
+        return books.stream().filter(
+                (book) -> (name == null || book.getName().contains(name)) &&
+                        (author == null || book.getAuthor().contains(author)) &&
+                        (genres == null || book.getGenres().containsAll(genres)) &&
+                        (shelfCode == null || book.getShelfCode().equals(shelfCode))
+                ).collect(Collectors.toList());
     }
 
     @Override
@@ -107,7 +116,6 @@ public final class Library {
         return "" + books;
     }
 
-    public static void main(String[] args) {
-        //System.out.println();
-    }
+
 }
+
