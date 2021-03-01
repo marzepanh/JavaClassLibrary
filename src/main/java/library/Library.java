@@ -15,6 +15,8 @@
  */
 package library;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +37,7 @@ public final class Library {
     }
 
     public List<Book> getBooks() {
-        return books;
+        return new ArrayList<>(this.books);
     }
 
     private String generateShelfCode(String name) {
@@ -46,10 +48,21 @@ public final class Library {
         return "undefined" + code;
     }
 
-    public boolean add(Book book, String shelfCode) {
-        if (shelfCode == null || book == null) return false;
+    private void shelfCodeFormatCheck(String shelfCode) {
         if (!shelfCode.matches("[A-ZА-Я]\\d+"))
             throw new IllegalArgumentException("Wrong shelfCode");
+    }
+
+    private boolean isBookNotFound(int i) {
+        if (i == -1) {
+            System.out.println("Book not found");
+            return true;
+        } else return false;
+    }
+
+    public boolean add(Book book, String shelfCode) {
+        if (shelfCode == null || book == null) return false;
+
         book.setShelfCode(shelfCode);
         books.add(book);
         return true;
@@ -62,32 +75,26 @@ public final class Library {
 
     public boolean edit(Book book, Book newBook) {
         if (book == null || newBook == null) return false;
-        if (!newBook.getShelfCode().matches("[A-ZА-Я]\\d+"))
-            throw new IllegalArgumentException("Wrong shelfCode");
+        shelfCodeFormatCheck(newBook.getShelfCode());
         int i = books.indexOf(book);
-        if (i != -1) {
-            books.set(i, newBook);
-            return true;
-        }
-        return false;
+        if (isBookNotFound(i)) return false;
+        books.set(i, newBook);
+        return true;
+
     }
 
     public boolean move(Book book, String newShelfCode) {
         if (book == null || newShelfCode == null) return false;
-        for (Book cBook: books) {
-            if (cBook.equals(book)) {
-                if (!newShelfCode.matches("[A-ZА-Я]\\d+"))
-                    throw new IllegalArgumentException("Wrong shelfCode");
-                cBook.setShelfCode(newShelfCode);
-                return true;
-            }
-        }
-        return false;
+        shelfCodeFormatCheck(newShelfCode);
+        int i = books.indexOf(book);
+        if (isBookNotFound(i)) return false;
+        book.setShelfCode(newShelfCode);
+        return true;
     }
 
     //use null if parameter isn't important
-    public List<Book> find(String name, String author,
-                           List<String> genres, String shelfCode) {
+    public List<Book> find(@Nullable String name, @Nullable String author,
+                           @Nullable List<String> genres, @Nullable String shelfCode) {
         return books.stream().filter(
                 (book) -> (name == null || book.getName().contains(name)) &&
                         (author == null || book.getAuthor().contains(author)) &&
@@ -116,6 +123,11 @@ public final class Library {
         return "" + books;
     }
 
+    public static void main(String[] args) {
 
+        System.out.println(new Library(
+                new Book("HPMOR", "Eliezer Yudkowsky", new ArrayList<>(), ""),
+        new Book("HPMOR", "Eliezer Yudkowsky", new ArrayList<>(), "A5")));
+    }
 }
 

@@ -68,7 +68,8 @@ public final class Book {
 
     @Override
     public String toString() {
-        return "name: " + name + "\nauthor: " + author +
-                "\ngenres: " + genres + "\nshelfCode: " + shelfCode;
+        return System.lineSeparator() + "name: " + name + System.lineSeparator() + "author: " + author +
+                System.lineSeparator() + "genres: " + genres + System.lineSeparator()
+                + "shelfCode: " + shelfCode;
     }
 }
