@@ -15,6 +15,7 @@
  */
 package library;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -48,9 +49,9 @@ public final class Library {
         return "undefined" + code;
     }
 
-    private void shelfCodeFormatCheck(String shelfCode) {
+    private void shelfCodeFormatCheck(String shelfCode) throws IllegalShelfCodeException {
         if (!shelfCode.matches("[A-ZА-Я]\\d+"))
-            throw new IllegalArgumentException("Wrong shelfCode");
+            throw new IllegalShelfCodeException("Wrong shelfCode");
     }
 
     private boolean isBookNotFound(int i) {
@@ -73,7 +74,7 @@ public final class Library {
         return false;
     }
 
-    public boolean edit(Book book, Book newBook) {
+    public boolean edit(Book book, Book newBook) throws IllegalShelfCodeException {
         if (book == null || newBook == null) return false;
         shelfCodeFormatCheck(newBook.getShelfCode());
         int i = books.indexOf(book);
@@ -83,7 +84,7 @@ public final class Library {
 
     }
 
-    public boolean move(Book book, String newShelfCode) {
+    public boolean move(Book book, String newShelfCode) throws IllegalShelfCodeException {
         if (book == null || newShelfCode == null) return false;
         shelfCodeFormatCheck(newShelfCode);
         int i = books.indexOf(book);
@@ -93,7 +94,7 @@ public final class Library {
     }
 
     //use null if parameter isn't important
-    public List<Book> find(@Nullable String name, @Nullable String author,
+    public List<Book> find(@NotNull Library this, @Nullable String name, @Nullable String author,
                            @Nullable List<String> genres, @Nullable String shelfCode) {
         return books.stream().filter(
                 (book) -> (name == null || book.getName().contains(name)) &&
@@ -123,11 +124,5 @@ public final class Library {
         return "" + books;
     }
 
-    public static void main(String[] args) {
-
-        System.out.println(new Library(
-                new Book("HPMOR", "Eliezer Yudkowsky", new ArrayList<>(), ""),
-        new Book("HPMOR", "Eliezer Yudkowsky", new ArrayList<>(), "A5")));
-    }
 }
 

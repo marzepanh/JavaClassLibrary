@@ -38,7 +38,7 @@ public class LibraryTest {
     }
 
     @Test
-    public void edit() {
+    public void edit() throws IllegalShelfCodeException {
         Library library = new Library(newBook);
         Book editedBook = new Book("HP and the Methods of Rationality",
                 "Eliezer Yudkowsky", List.of("hard fantasy", "adventure"), "A5");
@@ -50,7 +50,7 @@ public class LibraryTest {
     }
 
     @Test
-    public void move() {
+    public void move() throws IllegalShelfCodeException {
         Library library = new Library(newBook);
         assertTrue(library.move(newBook, "B2"));
         assertFalse(library.move(book, "B5"));
@@ -129,6 +129,12 @@ public class LibraryTest {
         Book book = testBook;
         book.setShelfCode("A5");
         assertEquals("A5", book.getShelfCode());
+    }
+
+    @Test(expected = IllegalShelfCodeException.class)
+    public void ShelfCodeException() throws IllegalShelfCodeException {
+        Library library = new Library(book, newBook);
+        library.move(book, "shelfCode");
     }
 
 }
